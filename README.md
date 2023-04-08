@@ -131,21 +131,73 @@ python inference_video.py --labelmap_path label_map.pbtxt --model_path experimen
 ## Submission Template
 ### Project overview
 
-This section should contain a brief description of the project and what we are trying to achieve. Why is object detection such an important component of self driving car systems?
+This repository contains the results of the project "Object Detection in Urban Environment" of Udacity's "Self-driving Car Engineer" Nanodegree.  The project is about detecting objects, such as cars, pedestrians and cyclists in images of the Waymo Open Dataset with the Tensorflow Object Detection API.  It is structured as follows:
+* Set up to run the code for this repository
+* Exploratory data analysis to better understand the data
+* Creation of training, testing and validation data splits
+* Training of model with Tensorflow object detection API
+* Post-processing to create an animation
 
 
 ### Set up
-This section should contain a brief description of the steps to follow to run the code for this repository.
+
+To run this model, the workspace provided by Udacity was used due to the non-availability of a Nvidia GPU.  This workspace differs from the content of the Udacity repository (['link'](https://github.com/udacity/nd013-c1-vision-starter)).
 
 
 ### Dataset
+
+In this section, the dataset is analyzed, and the creation of training, testing and validation splits is explained.
+
+
 #### Dataset analysis
 
-This section should contain a quantitative and qualitative description of the dataset. It should include images, charts and other visualizations.
+The dataset is analyzed in 2 steps: first, qualitatively based on visual inspection of images with bounding boxes, then quantitatively by considering the distribution of class occurrences in images.  Results in this section were obtained by `Exploratory Data Analysis.ipynb`.
 
 
-#### Cross validation
-This section should detail the cross validation strategy and justify your approach.
+##### Visual inspection
+
+The dataset includes images in various conditions as illustrated hereafter by 10 instances:
+* at different times of the day: day, dawn, night
+* in different weather conditions: sunny, foggy, rainy
+* in different environments: city, suburban, highway
+
+Represented ground truth annotations frequently include cars (red) and pedestrians (blue), while cyclists (green) are more rare.  Further, some images seem to not have been annotated (the car in the picture at night).
+
+![Image0](images/img0.png) ![Image1](images/img1.png)
+![Image2](images/img2.png) ![Image3](images/img3.png)
+![Image4](images/img4.png) ![Image5](images/img5.png)
+![Image6](images/img6.png) ![Image7](images/img7.png)
+![Image8](images/img8.png) ![Image9](images/img9.png)
+
+
+##### Distribution of classes
+
+The averge number of objects per image based on a random sample of 10,000 images is illustrated in the following figure.  It confirms our previous qualitative assessment by stating that cars and pedestrians are much more frequent than cyclists.  More precisely, about 17 vehicles, 5 pedestrians and 0.1 cyclists appear on average in an image, which seems realistic in a North American context.
+
+![Average number of objects per image](images/avgNbrObjPerIm.png)
+
+In the following subsections, the distributions of vehicles, pedestrians and cyclists are described based on a random sampling of 10,000 images.
+
+
+###### Distribution of vehicles
+
+As illustrated below, images contain numerous vehicles with an irregular distribution decreasing to almost zero at about 40 vehicles.
+
+![Distribution of vehicles](images/distr_vehicles.png)
+
+
+###### Distribution of pedestrians
+
+About 50% of all images do not contain any pedestrian as shown by the initial bar in the following histogram.  If pedestrians are included, there are about 1 to 10.  At most, around 40 pedestrians are included in an image.
+
+![Distribution of pedestrians](images/distr_pedestrians.png)
+
+
+###### Distribution of cyclists
+
+As mentioned earlier, cyclists are very rare.  About 90% of the considered images do not contain any cyclist.  If cyclists are included in an image, there is mostly only one.  At most, around 4 simultaneous cyclists were found in the considered set of images.
+
+![Distribution of cyclists](images/distr_cyclists.png)
 
 
 ### Training
