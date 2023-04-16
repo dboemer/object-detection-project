@@ -209,7 +209,7 @@ As mentioned earlier, cyclists are very rare.  About 90% of the considered image
 
 #### Cross validation
 
-The data split was already provided in the folders `data/train` and `data/val` with respectively 86 and 10 files, i.e., a 86/96 = 90% training data / 10% validation data split.  According to the general guidelines in this course (80-90% / 10-20%), this a reasonable split.  It is assumed that the files have been shuffled randomly to have the same underlying distributions in both data sets.  This assumption could be tested by reiterating the previous analysis for the files in `data/val`.  This is not done here due to the instability of the work environement and the preselection of the data, as explained earlier.
+The data split was already provided in the folders `data/train` and `data/val` with respectively 86 and 10 files, i.e., a 86/96 = 90% training data / 10% validation data split.  According to the general guidelines in this course (80-90% / 10-20%), this is a reasonable split.  It is assumed that the files have been shuffled randomly to have the same underlying distributions in both data sets.  This assumption could be tested by reiterating the previous analysis for the files in `data/val`.  This is not done here due to the instability of the work environement and the preselection of the data, as explained earlier.
 
 
 ### Training
@@ -227,7 +227,7 @@ Therefore, the pretrained model is first downloaded and decompressed by the foll
     rm -rf sd_resnet50_v1_fpn_640x640_coco17_tpu-8.tar.gz
 
 
-To paramerize a training run a configuration file is created as follows:
+To paramerize a training run, a configuration file is created as follows:
 
     cd /home/workspace/
 
@@ -270,7 +270,7 @@ In addition to the previous option, data augmentation is added later on.
 
 ##### Reduction of the learning rate
 
-The learning rate (`learning_rate_base`) is reduced from 0.04 to 0.02 (experiment01).  As indicated by the following figure, the total loss is significantly smaller than in the reference experiment.  This is clearly an improvement.
+The learning rate (`learning_rate_base`) is reduced from 0.04 to 0.02 (experiment 1).  As indicated by the following figure, the total loss is significantly smaller than in the reference experiment.  This is clearly an improvement.
 
 <img src="images/experiment01-loss.svg" alt="Experiment01-loss" width="400"/>
 
@@ -281,19 +281,19 @@ Nevertheless, the loss still remains relatively significant, which becomes appar
 
 ##### Increase of the batch size
 
-The batch size (`batch_size`) is increased from 2 to 4 (experiment02). Overall, the loss is significantly smaller than previously.  The decreasing trend indicates that increasing the number of iterations could further decrease the loss.  As explained earlier, this is hardely feasible with the work environment provided by Udacity, which is why this option is not further analyzed.  As an alternative, the optimizer Adam is applied in the following section.
+The batch size (`batch_size`) is increased from 2 to 4 (experiment 2). Overall, the loss is significantly smaller than previously.  The decreasing trend indicates that increasing the number of iterations could further decrease the loss.  As explained earlier, this is hardely feasible with the work environment provided by Udacity, which is why this option is not further analyzed.  As an alternative, the optimizer Adam is applied in the following section.
 
 <img src="images/experiment02-loss.svg" alt="Experiment02-loss" width="400"/>
 
 
 ##### Change the optimization algorithm
 
-The optimizer Adam ([link](https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/Adam)) is applied with exponential decay ([link](https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/schedules/ExponentialDecay)) of the learning rate and the default learning rate of 0.001; all other hyperparameters are unchanged with respect to the reference configuration (experiment03).  The following figure shows that the resulting total loss decreases more significantly than in the previous experiments.  It increases, however, towards the end, which suggests, that either the learning rate is too high or the approximation of the gradient too crude.
+The optimizer Adam ([link](https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/Adam)) is applied with exponential decay ([link](https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/schedules/ExponentialDecay)) of the learning rate and the default learning rate of 0.001; all other hyperparameters are unchanged with respect to the reference configuration (experiment 3).  The following figure shows that the resulting total loss decreases more significantly than in the previous experiments.  It increases, however, towards the end, which suggests, that either the learning rate is too high or the approximation of the gradient too crude.
 
 <img src="images/experiment03-loss.svg" alt="Experiment03-loss" width="400"/>
 
 
-For this reason, the batch size is again increased from 2 to 4, still with the Adam optimizer (experiment04).  The resulting total loss becomes for the first time smaller than 1, as shown below.
+For this reason, the batch size is again increased from 2 to 4, still with the Adam optimizer (experiment 4).  The resulting total loss becomes for the first time smaller than 1, as shown below.
 
 <img src="images/experiment04-loss.svg" alt="Experiment04-loss" width="400"/>
 
@@ -311,7 +311,7 @@ In comparison to experiment 4, one additional car, which is further away and exp
 
 <img src="images/experiment05-comparison.png" alt="Experiment05-Comparison" width="400"/>
 
-While the smoothed total training loss (smoothing = 0.95) is equal to 0.59, the total validation loss is equal to 0.84.  If the validation loss is higher than the training loss, as in this case, it means that the model is overfitting to the training data.  To avoid overfitting, data augmentation instead of collecting more training data can be applied.
+While the smoothed total training loss (smoothing = 0.95) is equal to 0.59, the total validation loss is equal to 0.84.  If the validation loss is higher than the training loss, as in this case, it means that the model is overfitting.  To avoid overfitting, data augmentation instead of collecting more training data can be applied.
 
 
 ##### Data augmentation
@@ -328,7 +328,7 @@ These augmentation are illustrated by the following images, in which the contras
 <img src="images/augmentation03.png" alt="Augmentation03" width="200"/>
 
 
-The resulting total loss is shown in the following figure as a function of the iterations.  The comparison of this loss with the loss in experiment 5, i.e., without data augmentation indicates that the result have a become slightly worse in the sense that the total training loss has increased from 0.59 to 0.61 (smoothing of 0.95).
+The resulting total loss is shown in the following figure as a function of the iterations (rerun at checkpoint required; this explain the vertical line).  The comparison of this loss with the loss in experiment 5, i.e., without data augmentation, indicates that the result have become slightly worse in the sense that the total training loss has increased from 0.59 to 0.61 (smoothing of 0.95).
 
 <img src="images/experiment06-loss.svg" alt="Experiment06-loss" width="400"/>
 
@@ -350,8 +350,8 @@ The `animation.gif` file is renamed to `animation.mp4`, and then compressed as f
     ffmpeg -i output.mp4 -vf "fps=5, scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" animation.gif
 
 
-Thus, we obtain these animations, which clearly show the ability of the model to detect cars and which becomes increasingly difficult by night.
+Thus, we obtain these animations, which clearly show the ability of the model to detect cars and which becomes increasingly difficult by night.  The weaknesses of the model are the detection of the vehicle locations (very close vehicle from the side) and the detection of multiple vehicles, where there is only one (see non-max-supression).
 
-<img src="images/animation1.gif" alt="Animation1" width="600"/>
-<img src="images/animation2.gif" alt="Animation2" width="600"/>
-<img src="images/animation3.gif" alt="Animation3" width="600"/>
+<img src="animations/animation1.gif" alt="Animation1" width="600"/>
+<img src="animations/animation2.gif" alt="Animation2" width="600"/>
+<img src="animations/animation3.gif" alt="Animation3" width="600"/>
