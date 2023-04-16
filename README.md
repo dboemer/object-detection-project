@@ -131,7 +131,7 @@ python inference_video.py --labelmap_path label_map.pbtxt --model_path experimen
 ## Submission Template
 ### Project overview
 
-This repository contains the results of the project "Object Detection in Urban Environment" of Udacity's "Self-driving Car Engineer" Nanodegree.  The project is about detecting objects, such as cars, pedestrians and cyclists in images of the Waymo Open Dataset with the Tensorflow Object Detection API.  It is structured as follows:
+This repository contains the results of the project "Object Detection in Urban Environment" of Udacity's "Self-driving Car Engineer" Nanodegree.  The project is about detecting objects, such as cars, pedestrians and cyclists in images of the Waymo Open Dataset with the Tensorflow Object Detection API (SSD Resnet-50 640x640).  It is structured as follows:
 * Set up to run the code for this repository
 * Exploratory data analysis to better understand the data
 * Creation of training, testing and validation data splits
@@ -141,7 +141,7 @@ This repository contains the results of the project "Object Detection in Urban E
 
 ### Set up
 
-To run this model, the workspace provided by Udacity was used due to the non-availability of a Nvidia GPU.  This workspace differs from the content of the Udacity repository (['link'](https://github.com/udacity/nd013-c1-vision-starter)).
+To run this model, the workspace provided by Udacity was used.  This workspace can be set up by following the instructions in the `build` folder.
 
 
 ### Dataset
@@ -151,7 +151,9 @@ In this section, the dataset is analyzed, and the creation of training, testing 
 
 #### Dataset analysis
 
-The dataset is analyzed in 2 steps: first, qualitatively based on visual inspection of images with bounding boxes, then quantitatively by considering the distribution of class occurrences in images.  Results in this section were obtained by `Exploratory Data Analysis.ipynb`.
+The dataset is analyzed in 2 steps: first, qualitatively based on visual inspection of images with bounding boxes, then quantitatively by considering the distribution of class occurrences in images.
+
+Results in this section were obtained by the Jupyter notebook `Exploratory Data Analysis.ipynb` based on the data in `data/train`.  Stricly speaking, this analysis should be performed on all available data and the splits (training, validation, testing) should then be created by random sampling.  Due to the instability of the work environement provided by Udacity (crashes of Jupyter in Firefox and Chromium) and the preselection of the data in this environement (available files in `training` / `validation` / `testing` folders), these last steps had not to be performed.
 
 
 ##### Visual inspection
@@ -163,16 +165,21 @@ The dataset includes images in various conditions as illustrated hereafter by 10
 
 Represented ground truth annotations frequently include cars (red) and pedestrians (blue), while cyclists (green) are more rare.  Further, some images seem to not have been annotated (the car in the picture at night).
 
-![Image0](images/img0.png) ![Image1](images/img1.png)
-![Image2](images/img2.png) ![Image3](images/img3.png)
-![Image4](images/img4.png) ![Image5](images/img5.png)
-![Image6](images/img6.png) ![Image7](images/img7.png)
-![Image8](images/img8.png) ![Image9](images/img9.png)
+<img src="images/img0.png" alt="Image0" width="400"/>
+<img src="images/img1.png" alt="Image1" width="400"/>
+<img src="images/img2.png" alt="Image2" width="400"/>
+<img src="images/img3.png" alt="Image3" width="400"/>
+<img src="images/img4.png" alt="Image4" width="400"/>
+<img src="images/img5.png" alt="Image5" width="400"/>
+<img src="images/img6.png" alt="Image6" width="400"/>
+<img src="images/img7.png" alt="Image7" width="400"/>
+<img src="images/img8.png" alt="Image8" width="400"/>
+<img src="images/img9.png" alt="Image9" width="400"/>
 
 
 ##### Distribution of classes
 
-The averge number of objects per image based on a random sample of 10,000 images is illustrated in the following figure.  It confirms our previous qualitative assessment by stating that cars and pedestrians are much more frequent than cyclists.  More precisely, about 17 vehicles, 5 pedestrians and 0.1 cyclists appear on average in an image, which seems realistic in a North American context.
+The averge number of objects per image based on a random sample of 10,000 images is illustrated in the following figure.  It confirms our previous qualitative assessment by stating that cars and pedestrians are much more frequent than cyclists.  More precisely, about 17 vehicles, 5 pedestrians and 0.1 cyclists appear on average in an image, which is realistic in a North American urban context.
 
 ![Average number of objects per image](images/avgNbrObjPerIm.png)
 
@@ -198,14 +205,3 @@ About 50% of all images do not contain any pedestrian as shown by the initial ba
 As mentioned earlier, cyclists are very rare.  About 90% of the considered images do not contain any cyclist.  If cyclists are included in an image, there is mostly only one.  At most, around 4 simultaneous cyclists were found in the considered set of images.
 
 ![Distribution of cyclists](images/distr_cyclists.png)
-
-
-### Training
-#### Reference experiment
-
-This section should detail the results of the reference experiment. It should includes training metrics and a detailed explanation of the algorithm's performances.
-
-
-#### Improve on the reference
-
-This section should highlight the different strategies you adopted to improve your model. It should contain relevant figures and details of your findings.
