@@ -205,3 +205,10 @@ About 50% of all images do not contain any pedestrian as shown by the initial ba
 As mentioned earlier, cyclists are very rare.  About 90% of the considered images do not contain any cyclist.  If cyclists are included in an image, there is mostly only one.  At most, around 4 simultaneous cyclists were found in the considered set of images.
 
 ![Distribution of cyclists](images/distr_cyclists.png)
+
+
+#### Cross validation
+
+The data split was already provided in the folders `data/train` and `data/val` with respectively 86 and 10 files, i.e., a 86/96 = 90% training data / 10% validation data split.  According to the general guidelines in this course (80-90% / 10-20%), this a reasonable split.  It is assumed that the files have been shuffled randomly to have the same underlying distributions in both data sets.  This assumption could be tested by reiterating the previous analysis for the files in `data/val`.  This is not done here due to the instability of the work environement and the preselection of the data, as explained earlier.
+
+
