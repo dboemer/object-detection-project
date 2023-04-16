@@ -347,7 +347,7 @@ The `animation.gif` file is renamed to `animation.mp4`, and then compressed as f
 
     ffmpeg -i animation.mp4 output.mp4
 
-    ffmpeg -ss 30 -t 3 -i output.mp4 -vf "fps=5, scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" animation.gif
+    ffmpeg -i output.mp4 -vf "fps=5, scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" animation.gif
 
 
 Thus, we obtain these animations, which clearly show the ability of the model to detect cars and which becomes increasingly difficult by night.
