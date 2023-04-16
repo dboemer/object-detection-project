@@ -334,3 +334,24 @@ The resulting total loss is shown in the following figure as a function of the i
 
 The corresponding validation loss has also slightly increased from 0.84 to 0.86.  This very small variation does not allow any conclusion besides that fact, that data augmentation within the previous bounds does not have a significant influence on the detective ability of the model.  This parametric study could be continued by introducing stronger augmentations, but considering the very restrictive nature of Udacity's work environment (explained above), it is ended here.
 
+
+### Animation
+
+Finally animations are created to illustrate the ability of the model to detect the respective objects in the model.  These animation are created by the following commands, in which the test data sets are used:
+
+    python experiments/exporter_main_v2.py --input_type image_tensor --pipeline_config_path experiments/experiment06/pipeline_new.config --trained_checkpoint_dir experiments/experiment06/ --output_directory experiments/experiment06/exported/
+
+    python inference_video.py --labelmap_path label_map.pbtxt --model_path experiments/experiment06/exported/saved_model --tf_record_path data/test/segment-12200383401366682847_2552_140_2572_140_with_camera_labels.tfrecord --config_path experiments/experiment06/pipeline_new.config --output_path animation.gif
+
+The `animation.gif` file is renamed to `animation.mp4`, and then compressed as follows:
+
+    ffmpeg -i animation.mp4 output.mp4
+
+    ffmpeg -ss 30 -t 3 -i output.mp4 -vf "fps=5, scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" animation.gif
+
+
+Thus, we obtain these animations, which clearly show the ability of the model to detect cars and which becomes increasingly difficult by night.
+
+<img src="images/animation1.gif" alt="Animation1" width="600"/>
+<img src="images/animation2.gif" alt="Animation2" width="600"/>
+<img src="images/animation3.gif" alt="Animation3" width="600"/>
