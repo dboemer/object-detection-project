@@ -212,3 +212,125 @@ As mentioned earlier, cyclists are very rare.  About 90% of the considered image
 The data split was already provided in the folders `data/train` and `data/val` with respectively 86 and 10 files, i.e., a 86/96 = 90% training data / 10% validation data split.  According to the general guidelines in this course (80-90% / 10-20%), this a reasonable split.  It is assumed that the files have been shuffled randomly to have the same underlying distributions in both data sets.  This assumption could be tested by reiterating the previous analysis for the files in `data/val`.  This is not done here due to the instability of the work environement and the preselection of the data, as explained earlier.
 
 
+### Training
+
+In this section, the SSD Resnet-50 640x640 model is trained based on the previous data: first, by using the provided reference configuration, and later, by using improved configurations for training.
+
+Therefore, the pretrained model is first downloaded and decompressed by the following commands:
+
+    cd /home/workspace/experiments/pretrained_model/
+
+    wget http://download.tensorflow.org/models/object_detection/tf2/20200711/ssd_resnet50_v1_fpn_640x640_coco17_tpu-8.tar.gz
+
+    tar -xvzf sd_resnet50_v1_fpn_640x640_coco17_tpu-8.tar.gz
+
+    rm -rf sd_resnet50_v1_fpn_640x640_coco17_tpu-8.tar.gz
+
+
+To paramerize a training run a configuration file is created as follows:
+
+    cd /home/workspace/
+
+    python edit_config.py --train_dir /home/workspace/data/train/ --eval_dir /home/workspace/data/val --batch_size 2 --checkpoint /home/workspace/experiments/pretrained_model/ssd_resnet50_v1_fpn_640x640_coco17_tpu-8/checkpoint/ckpt-0 --label_map /home/workspace/experiments/label_map.pbtxt
+
+
+The created `pipeline_new.config` file is then moved to an "experiment" folder, e.g., `/home/workspace/experiments/reference`, which will contain the resulting training results after starting the training by the following command:
+
+    python experiments/model_main_tf2.py --model_dir=experiments/reference/ --pipeline_config_path=experiments/reference/pipeline_new.config
+
+
+Results can later be analyzed by the Tensorboard:
+
+    python -m tensorboard.main --logdir experiments/reference/
+
+
+An finally the cross-validation run is executed as follows:
+
+    python experiments/model_main_tf2.py --model_dir=experiments/reference/ --pipeline_config_path=experiments/reference/pipeline_new.config --checkpoint_dir=experiments/reference/
+
+
+
+#### Reference experiment
+
+As illustrated by the total loss (as a function of iterations) below, no convergence to a relatively small loss can be observed even after 2500 iterations.  In consequence, precision and recall are close to 0.
+
+<img src="images/reference-loss.svg" alt="Reference-loss" width="400"/>
+
+
+#### Improve on the reference
+
+Since the model did not converge to a relatively small loss, different options are available to further reduce it, i.a.:
+- **Increase the number of iterations**: considering the low convergence speed in the previous picture, this option cannot be recommended. In addition, the instability of the work environment provided by Udacity, its low speed and its automatic shutdown after 5 min, when the user is not clicking on a pop-up windows, make this option hardly feasible;
+- **Decrease the learning rate to prevent overshoots**: this option is tested hereafter;
+- **Increase the batch size to obtain a better gradient estimation**: this option is tested hereafter;
+- **Change the optimization algorithm**, e.g. to the Adam optimizer, which is known to work particularly well with a wide range of neural networks: this option is tested hereafter.
+
+In addition to the previous option, data augmentation is added later on.
+
+
+##### Reduction of the learning rate
+
+The learning rate (`learning_rate_base`) is reduced from 0.04 to 0.02 (experiment01).  As indicated by the following figure, the total loss is significantly smaller than in the reference experiment.  This is clearly an improvement.
+
+<img src="images/experiment01-loss.svg" alt="Experiment01-loss" width="400"/>
+
+Nevertheless, the loss still remains relatively significant, which becomes apparent, when validating the model.  In fact, no car, pedestrian or bicycle was detected in the following illustration, which compares model results to ground truth.
+
+<img src="images/experiment01-comparison.png" alt="Experiment01-Comparison" width="400"/>
+
+
+##### Increase of the batch size
+
+The batch size (`batch_size`) is increased from 2 to 4 (experiment02). Overall, the loss is significantly smaller than previously.  The decreasing trend indicates that increasing the number of iterations could further decrease the loss.  As explained earlier, this is hardely feasible with the work environment provided by Udacity, which is why this option is not further analyzed.  As an alternative, the optimizer Adam is applied in the following section.
+
+<img src="images/experiment02-loss.svg" alt="Experiment02-loss" width="400"/>
+
+
+##### Change the optimization algorithm
+
+The optimizer Adam ([link](https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/Adam)) is applied with exponential decay ([link](https://www.tensorflow.org/api_docs/python/tf/keras/optimizers/schedules/ExponentialDecay)) of the learning rate and the default learning rate of 0.001; all other hyperparameters are unchanged with respect to the reference configuration (experiment03).  The following figure shows that the resulting total loss decreases more significantly than in the previous experiments.  It increases, however, towards the end, which suggests, that either the learning rate is too high or the approximation of the gradient too crude.
+
+<img src="images/experiment03-loss.svg" alt="Experiment03-loss" width="400"/>
+
+
+For this reason, the batch size is again increased from 2 to 4, still with the Adam optimizer (experiment04).  The resulting total loss becomes for the first time smaller than 1, as shown below.
+
+<img src="images/experiment04-loss.svg" alt="Experiment04-loss" width="400"/>
+
+
+The model now becomes usefull as the location of cars starts to be predicted.  This is illustrated by the following figure, which compares again the model results to the corresponding ground truth.
+
+<img src="images/experiment04-comparison.png" alt="Experiment04-Comparison" width="400"/>
+
+
+Since the loss is still relatively high (around 1), the learning rate is reduced to 0.00005 (from 0.001, after having tested larger learning rates) and the decay steps to 700 (from 2500), in addition to keeping the batch size at 4 (instead of 2).  This hyperparameter tuning in experiment 5 finally reduces the total loss consistently below 1 (smoothing in representation set to 0.95).
+
+<img src="images/experiment05-loss.svg" alt="Experiment05-loss" width="400"/>
+
+In comparison to experiment 4, one additional car, which is further away and expected to be more difficult to detect, was detected in the following validation example:
+
+<img src="images/experiment05-comparison.png" alt="Experiment05-Comparison" width="400"/>
+
+While the smoothed total training loss (smoothing = 0.95) is equal to 0.59, the total validation loss is equal to 0.84.  If the validation loss is higher than the training loss, as in this case, it means that the model is overfitting to the training data.  To avoid overfitting, data augmentation instead of collecting more training data can be applied.
+
+
+##### Data augmentation
+
+To increase the training sample size, three different augmentation methods, which create realistic extrapolations of the initial training sample, are used in experiment 6:
+- **Random RGB to gray** (probability of 0.2), simulating a day-to-night transformation
+- **Random adjustment of brightness** (max_delta of 0.2), simulating different lighting conditions
+- **Random adjustment of contrast** (min_delta of 0.8, max_delta of 1.25), simulating different lighting conditions
+
+These augmentation are illustrated by the following images, in which the contrast adjustment is the least visible:
+
+<img src="images/augmentation01.png" alt="Augmentation01" width="200"/>
+<img src="images/augmentation02.png" alt="Augmentation02" width="200"/>
+<img src="images/augmentation03.png" alt="Augmentation03" width="200"/>
+
+
+The resulting total loss is shown in the following figure as a function of the iterations.  The comparison of this loss with the loss in experiment 5, i.e., without data augmentation indicates that the result have a become slightly worse in the sense that the total training loss has increased from 0.59 to 0.61 (smoothing of 0.95).
+
+<img src="images/experiment06-loss.svg" alt="Experiment06-loss" width="400"/>
+
+The corresponding validation loss has also slightly increased from 0.84 to 0.86.  This very small variation does not allow any conclusion besides that fact, that data augmentation within the previous bounds does not have a significant influence on the detective ability of the model.  This parametric study could be continued by introducing stronger augmentations, but considering the very restrictive nature of Udacity's work environment (explained above), it is ended here.
+
